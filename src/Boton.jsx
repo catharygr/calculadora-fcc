@@ -1,5 +1,4 @@
-import React from "react";
-
+/* eslint-disable react/prop-types */
 export default function Boton({ color, id, value, handleClick, type }) {
   return (
     <button
