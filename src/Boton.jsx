@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-export default function Boton({ color, id, value, handleClick }) {
+export default function Button({ color, id, value, handleClick }) {
   return (
     <button
       onClick={() => handleClick(value)}

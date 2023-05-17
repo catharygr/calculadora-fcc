@@ -9,7 +9,7 @@ function App() {
 
   function handleNum(num) {
     // No permitir multiples cero consecutivos al inicio
-    if (displayNum === "0" && num === 0) {
+    if (displayNum === "0" && num === "0") {
       return;
     }
     //Si el displayNum es 0 y operandi no es null asignar el valor del num sin concatenar
@@ -21,7 +21,7 @@ function App() {
     }
   }
 
-  function handleOperandy(operandi) {
+  function handleOperandy() {
     // Si el primer numero es null asinar el de display como el primero
     if (firsNum === null) {
       setFirtNum(parseFloat(displayNum));
