@@ -3,148 +3,189 @@ import "../style.css";
 import Boton from "./Boton";
 
 function App() {
-  const [display, setDisplay] = useState("0");
-  const [resultado, setResultado] = useState(0);
+  const [displayNum, setDisplayNum] = useState("0");
+  const [operandi, setOperandi] = useState(null);
+  const [firsNum, setFirtNum] = useState(null);
 
-  function handleClick(value, type) {
-    if (type === "AC") {
-      setDisplay("0");
-      setResultado(0);
+  function handleNum(num) {
+    // No permitir multiples cero consecutivos al inicio
+    if (displayNum === "0" && num === "0") {
+      return;
     }
-    if (type === "number") {
-      setDisplay((oldNum) => {
-        let firstZero = oldNum === "0" ? "" : oldNum;
-        return (firstZero += value);
-      });
-      setResultado((oldNum) => {
-        let firstZero = oldNum === 0 ? 0 : oldNum;
-        return (firstZero += Number(value));
-      });
-    }
-    if (type === "operandi") {
-      console.log(value);
+    //Si el displayNum es 0 y operandi no es null asignar el valor del num sin concatenar
+    if (displayNum === "0" || operandi !== null) {
+      setDisplayNum(num);
+      setOperandi(null);
+    } else {
+      setDisplayNum(displayNum + num);
     }
   }
 
-  console.log(resultado);
+  function handleOperandy(operandi) {
+    // Si el primer numero es null asinar el de display como el primero
+    if (firsNum === null) {
+      setFirtNum(parseFloat(displayNum));
+      // realizar el calculo si ya hay un operator y no es igual
+    } else if (operandi !== "=") {
+      const resultado = calcularResultado();
+      // Asignar ambos al resultado del calculo
+      setDisplayNum(resultado);
+      setFirtNum(resultado);
+    }
+    setOperandi(operandi);
+  }
+
+  function calcularResultado() {
+    // Convertir displayNum string  en numero y guardarlo
+    const segundoNum = parseFloat(displayNum);
+    switch (operandi) {
+      case "+":
+        return firsNum + segundoNum;
+      case "-":
+        return firsNum - segundoNum;
+      case "*":
+        return firsNum * segundoNum;
+      case "/":
+        return firsNum / segundoNum;
+      default:
+        return segundoNum;
+    }
+  }
+  // Resetear los tres seters
+  function handleAc() {
+    setDisplayNum("0");
+    setOperandi(null);
+    setFirtNum(null);
+  }
+
+  function handleEquals() {
+    // Si el primer numero no es null y si operandi es null
+    if (firsNum !== null && operandi !== null) {
+      const resultado = calcularResultado();
+      setDisplayNum(String(resultado));
+      setFirtNum(null);
+      setOperandi(null);
+    }
+  }
+
   return (
     <main className="container">
-      <div id="display">{display}</div>
+      <div id="display">{displayNum}</div>
       <Boton
         type="AC"
-        handleClick={handleClick}
+        handleClick={handleAc}
         value="AC"
         id="clear"
         color="orange"
       />
       <Boton
         type="operandi"
-        handleClick={handleClick}
+        handleClick={handleOperandy}
         value="/"
         id="divide"
         color="gray"
       />
       <Boton
         type="operandi"
-        handleClick={handleClick}
+        handleClick={handleOperandy}
         value="x"
         id="multiply"
         color="gray"
       />
       <Boton
         type="number"
-        handleClick={handleClick}
+        handleClick={handleNum}
         value="7"
         id="seven"
         color="darkgray"
       />
       <Boton
         type="number"
-        handleClick={handleClick}
+        handleClick={handleNum}
         value="8"
         id="eight"
         color="darkgray"
       />
       <Boton
         type="number"
-        handleClick={handleClick}
+        handleClick={handleNum}
         value="9"
         id="nine"
         color="darkgray"
       />
       <Boton
         type="operandi"
-        handleClick={handleClick}
+        handleClick={handleOperandy}
         value="-"
         id="subtract"
         color="gray"
       />
       <Boton
         type="number"
-        handleClick={handleClick}
+        handleClick={handleNum}
         value="4"
         id="four"
         color="darkgray"
       />
       <Boton
         type="number"
-        handleClick={handleClick}
+        handleClick={handleNum}
         value="5"
         id="five"
         color="darkgray"
       />
       <Boton
         type="number"
-        handleClick={handleClick}
+        handleClick={handleNum}
         value="6"
         id="six"
         color="darkgray"
       />
       <Boton
         type="operandi"
-        handleClick={handleClick}
+        handleClick={handleOperandy}
         value="+"
         id="add"
         color="gray"
       />
       <Boton
         type="number"
-        handleClick={handleClick}
+        handleClick={handleNum}
         value="1"
         id="one"
         color="darkgray"
       />
       <Boton
         type="number"
-        handleClick={handleClick}
+        handleClick={handleNum}
         value="2"
         id="two"
         color="darkgray"
       />
       <Boton
         type="number"
-        handleClick={handleClick}
+        handleClick={handleNum}
         value="3"
         id="three"
         color="darkgray"
       />
       <Boton
         type="operandi"
-        handleClick={handleClick}
+        handleClick={handleEquals}
         value="="
         id="equals"
         color="blue"
       />
       <Boton
         type="number"
-        handleClick={handleClick}
+        handleClick={handleNum}
         value="0"
         id="zero"
         color="darkgray"
       />
       <Boton
         type="operandi"
-        handleClick={handleClick}
+        handleClick={handleNum}
         value="."
         id="decimal"
         color="darkgray"
