@@ -5,187 +5,255 @@ import "../style.css";
 function App() {
   const [displayNum, setDisplayNum] = useState("0");
   const [operandi, setOperandi] = useState(null);
-  const [firsNum, setFirtNum] = useState(null);
+  const [firstNum, setFirstNum] = useState(null);
+  const [newDisplay, setNewdisplay] = useState(false);
+  const [whatType, setWhatType] = useState("number");
+  const [lastOperandi, setLastOperandi] = useState(null);
+  const [panic, setPanic] = useState(false);
 
-  function handleNum(num) {
-    // No permitir multiples cero consecutivos al inicio
-    if (displayNum === "0" && num === "0") {
+  function handleNumero(numero, type) {
+    // Primero debo averiguar si el display numeber es 0 y si mandamos 0 en tal caso no tenemos que hacer nada
+    // Si empezamos con 0 el numero que ponemos (4) debe ser puesto en display en lugar de 0 a no ser que se trata de decimal .
+    // Si es decimal debe concatenarse
+    // Si hay un decimal no debe poner  otro
+    // Si es cualquer otro numero debe concatenarse
+    // Si hay numero guardado sustituir el de display igual como si esta 0
+
+    // Si se ingresan 2 o más operadores consecutivamente, la operación realizada debe ser el último operador ingresado (excluyendo el signo negativo (-)). Por ejemplo, si se ingresa 5 + * 7 =, el resultado debe ser 35 (es decir, 5 * 7); si se ingresa 5 * - 5 =, el resultado debe ser -25 (es decir, 5 * (-5)).
+    // "5 * - + 5" = debe dar una salida de "10"
+    // 3 + 5 * 6 - 2/4 debería dar 32,5 o 11,5
+
+    if (panic && operandi === "-") {
+      console.log("PANIC actual operandi es -");
+      setDisplayNum(operandi + numero);
+      setOperandi(lastOperandi);
+      setPanic(false);
       return;
     }
-    //Si el displayNum es 0 y operandi no es null asignar el valor del num sin concatenar
-    if (displayNum === "0" || operandi !== null) {
-      setDisplayNum(num);
-      setOperandi(null);
+
+    if (displayNum === "0" && numero === "0") {
+      console.log("Zero consecutivo");
+      return;
+    }
+    const isThereDecimal = displayNum.includes(".");
+
+    if (displayNum === "0" && numero === "." && !isThereDecimal) {
+      console.log("Punto concatenado");
+      setDisplayNum(displayNum + numero);
+    } else if (displayNum === "0" || !newDisplay) {
+      console.log("Numero 0 sustituido");
+      setDisplayNum(numero);
+      setNewdisplay(true);
+    } else if (numero === ".") {
+      if (!isThereDecimal) {
+        console.log("Added . en un numero normal");
+        setDisplayNum(displayNum + numero);
+      }
     } else {
-      setDisplayNum(displayNum + num);
+      console.log("numero concatenado");
+      setDisplayNum(displayNum + numero);
     }
+    setWhatType(type);
   }
+  function calcularResultado(operator) {
+    // Convertir display numero string en numero numero y guardarlo
+    const secondNum = parseFloat(displayNum);
 
-  function handleOperandy() {
-    // Si el primer numero es null asinar el de display como el primero
-    if (firsNum === null) {
-      setFirtNum(parseFloat(displayNum));
-      // realizar el calculo si ya hay un operator y no es igual
-    } else if (operandi !== "=") {
-      const resultado = calcularResultado();
-      // Asignar ambos al resultado del calculo
-      setDisplayNum(resultado);
-      setFirtNum(resultado);
-    }
-    setOperandi(operandi);
-  }
-
-  function calcularResultado(operandi) {
-    // Convertir displayNum string  en numero y guardarlo
-    const segundoNum = parseFloat(displayNum);
-    switch (operandi) {
+    switch (operator) {
       case "+":
-        return firsNum + segundoNum;
+        return firstNum + secondNum;
       case "-":
-        return firsNum - segundoNum;
-      case "*":
-        return firsNum * segundoNum;
+        return firstNum - secondNum;
+      case "x":
+        return firstNum * secondNum;
       case "/":
-        return firsNum / segundoNum;
+        return firstNum / secondNum;
       default:
-        return segundoNum;
+        return secondNum;
     }
   }
-  // Resetear los tres seters
-  function handleAc() {
+  function handleOperandi(operator, type) {
+    // Function handleOperandi
+    // Si el numero guardado es null
+    // Añadir display número a número guardado
+    // Guardar operandi
+    // Resetear handleNúmeros para que empiece por un nuevo número. Hace falta un state para eso?
+    // Si número guardado existe
+    // Usar operandi para hacer cálculo entre número guardado y el número en display.
+    // Número retornado del calculo guardar como número guardado
+    // Asignar este número retornado a display número
+    // Guardar operandi
+    // Resetear newDisplay para que empiece por un nuevo número. Hace falta un state para eso?
+
+    // Si se ingresan 2 o más operadores consecutivamente, la operación realizada debe ser el último operador ingresado (excluyendo el signo negativo (-)). Por ejemplo, si se ingresa 5 + * 7 =, el resultado debe ser 35 (es decir, 5 * 7); si se ingresa 5 * - 5 =, el resultado debe ser -25 (es decir, 5 * (-5)).
+    // "5 * - + 5" = debe dar una salida de "10"
+
+    if (whatType === "number") {
+      if (firstNum === null) {
+        console.log("Promer numero guardado");
+        setFirstNum(parseFloat(displayNum));
+        setOperandi(operator);
+        setNewdisplay(false);
+      } else {
+        const resultado = calcularResultado(operandi);
+        console.log("operacion calculadora terminada");
+        setDisplayNum(String(resultado));
+        setFirstNum(resultado);
+        setOperandi(operator);
+        setNewdisplay(false);
+      }
+    }
+
+    // Si la ultima tecla era operandi, cambiar operandi nada mas
+    // "5 * - + 5" = debe dar una salida de "10"
+
+    if (whatType === "operandi") {
+      console.log("cambio de operandi");
+      setLastOperandi(operandi);
+      setOperandi(operator);
+      setPanic(true);
+    }
+    setWhatType(type);
+  }
+  function handleAC() {
+    // Resetear los tres estado
     setDisplayNum("0");
+    setFirstNum(null);
     setOperandi(null);
-    setFirtNum(null);
   }
+  function handleEqual() {
+    //Function =
+    // Hacer calculus
+    // Presentar el resultado en display
+    // setOperator a =
+    // Presionar un operador inmediatamente después de = debe iniciar un nuevo cálculo que opere sobre el resultado de la evaluación anterior
+    // console.log("Operacion = hecha");
 
-  function handleEquals() {
-    // Si el primer numero no es null y si operandi es null
-    if (firsNum !== null && operandi !== null) {
-      const resultado = calcularResultado();
-      setDisplayNum(String(resultado));
-      setFirtNum(null);
-      setOperandi(null);
-    }
+    const resultado = calcularResultado(operandi);
+    setDisplayNum(String(resultado));
+    setFirstNum(null);
+    setOperandi("=");
+    setNewdisplay(false);
+    setWhatType("number");
   }
-
   return (
     <main className="container">
       <div id="display">{displayNum}</div>
       <Boton
         type="AC"
-        handleClick={handleAc}
+        handleClick={handleAC}
         value="AC"
         id="clear"
         color="orange"
       />
       <Boton
         type="operandi"
-        handleClick={handleOperandy}
+        handleClick={handleOperandi}
         value="/"
         id="divide"
         color="gray"
       />
       <Boton
         type="operandi"
-        handleClick={handleOperandy}
+        handleClick={handleOperandi}
         value="x"
         id="multiply"
         color="gray"
       />
       <Boton
         type="number"
-        handleClick={handleNum}
+        handleClick={handleNumero}
         value="7"
         id="seven"
         color="darkgray"
       />
       <Boton
         type="number"
-        handleClick={handleNum}
+        handleClick={handleNumero}
         value="8"
         id="eight"
         color="darkgray"
       />
       <Boton
         type="number"
-        handleClick={handleNum}
+        handleClick={handleNumero}
         value="9"
         id="nine"
         color="darkgray"
       />
       <Boton
         type="operandi"
-        handleClick={handleOperandy}
+        handleClick={handleOperandi}
         value="-"
         id="subtract"
         color="gray"
       />
       <Boton
         type="number"
-        handleClick={handleNum}
+        handleClick={handleNumero}
         value="4"
         id="four"
         color="darkgray"
       />
       <Boton
         type="number"
-        handleClick={handleNum}
+        handleClick={handleNumero}
         value="5"
         id="five"
         color="darkgray"
       />
       <Boton
         type="number"
-        handleClick={handleNum}
+        handleClick={handleNumero}
         value="6"
         id="six"
         color="darkgray"
       />
       <Boton
         type="operandi"
-        handleClick={handleOperandy}
+        handleClick={handleOperandi}
         value="+"
         id="add"
         color="gray"
       />
       <Boton
         type="number"
-        handleClick={handleNum}
+        handleClick={handleNumero}
         value="1"
         id="one"
         color="darkgray"
       />
       <Boton
         type="number"
-        handleClick={handleNum}
+        handleClick={handleNumero}
         value="2"
         id="two"
         color="darkgray"
       />
       <Boton
         type="number"
-        handleClick={handleNum}
+        handleClick={handleNumero}
         value="3"
         id="three"
         color="darkgray"
       />
       <Boton
         type="operandi"
-        handleClick={handleEquals}
+        handleClick={handleEqual}
         value="="
         id="equals"
         color="blue"
       />
       <Boton
         type="number"
-        handleClick={handleNum}
+        handleClick={handleNumero}
         value="0"
         id="zero"
         color="darkgray"
       />
       <Boton
         type="operandi"
-        handleClick={handleNum}
+        handleClick={handleNumero}
         value="."
         id="decimal"
         color="darkgray"
@@ -193,4 +261,5 @@ function App() {
     </main>
   );
 }
+
 export default App;
